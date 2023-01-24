@@ -1,0 +1,44 @@
+###
+POST http://localhost:3000/auth/sign-in HTTP/1.1
+content-type: application/json
+
+{
+    "username": "lab",
+    "password": "lab"
+}
+
+###
+POST http://localhost:3000/users HTTP/1.1
+content-type: application/json
+
+{
+    "username": "lab0",
+    "password": "lab0"
+}
+
+### 
+GET http://localhost:3000/users HTTP/1.1
+
+### 
+GET http://localhost:3000/users/1 HTTP/1.1
+
+###
+PUT http://localhost:3000/users/3 HTTP/1.1
+content-type: application/json
+
+{
+    "username": "lab-update",
+    "password": "lab-update"
+}
+
+###
+DELETE http://localhost:3000/users/4 HTTP/1.1
+
+###
+POST http://localhost:3000/savings/create HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": "1",
+    "balance": 100
+}
