@@ -138,12 +138,10 @@ const savingsById = {
     },
     handler: (fastify) => async (req, reply) => {
         const { saving_id } = req.params
+        
         const e = await SavingsRepo.allEvent(fastify, saving_id)
-        // const result = e.reduce(Savings.on, {})
-        const result = e.reduce((acc, cur) => {
-            fastify.log.info(acc)
-            return Savings.on(acc, cur)
-        }, {})
+        const result = e.reduce(Savings.on, {})
+
         return {
             message: 'ok',
             data: result
