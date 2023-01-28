@@ -8,7 +8,7 @@ module.exports = async function (fastify, opts) {
     fastify.post('/activate', savingsActivate.opt, savingsActivate.handler(fastify))
     fastify.post('/deposit', savingsDeposit.opt, savingsDeposit.handler(fastify))
     fastify.post('/withdraw', savingsWithdraw.opt, savingsWithdraw.handler(fastify))
-    
+    fastify.get('/:saving_id', savingsById.opt, savingsById.handler(fastify))
 }
 
 const savingsCreate = {
@@ -21,7 +21,9 @@ const savingsCreate = {
             response: {
                 200: S.object()
                     .prop('message', S.string())
-                    .prop('data', S.object())
+                    .prop('data', S.object()
+                        .prop('saving_id', S.string())
+                    )
             }
         }
     },
@@ -32,7 +34,9 @@ const savingsCreate = {
 
         return {
             message: 'ok',
-            data: {},
+            data: {
+                saving_id: event.saving_id,
+            },
         }
     },
 }
@@ -67,8 +71,8 @@ const savingsDeposit = {
         schema: {
             tags: ['savings'],
             body: S.object()
-            .prop('saving_id', S.string()).required()
-            .prop('amount', S.number()).required(),
+                .prop('saving_id', S.string()).required()
+                .prop('amount', S.number()).required(),
             response: {
                 200: S.object()
                     .prop('message', S.string())
@@ -93,8 +97,8 @@ const savingsWithdraw = {
         schema: {
             tags: ['savings'],
             body: S.object()
-            .prop('saving_id', S.string()).required()
-            .prop('amount', S.number()).required(),
+                .prop('saving_id', S.string()).required()
+                .prop('amount', S.number()).required(),
             response: {
                 200: S.object()
                     .prop('message', S.string())
@@ -112,4 +116,37 @@ const savingsWithdraw = {
             data: {},
         }
     },
+}
+
+const savingsById = {
+    opt: {
+        schema: {
+            tags: ['savings'],
+            params: S.object()
+                .prop('saving_id', S.string()),
+            response: {
+                200: S.object()
+                    .prop('message', S.string())
+                    .prop('data', S.object()
+                        .prop('id', S.string())
+                        .prop('user_id', S.number())
+                        .prop('balance', S.number())
+                        .prop('status', S.string())
+                    )
+            }
+        }
+    },
+    handler: (fastify) => async (req, reply) => {
+        const { saving_id } = req.params
+        const e = await SavingsRepo.allEvent(fastify, saving_id)
+        // const result = e.reduce(Savings.on, {})
+        const result = e.reduce((acc, cur) => {
+            fastify.log.info(acc)
+            return Savings.on(acc, cur)
+        }, {})
+        return {
+            message: 'ok',
+            data: result
+        }
+    }
 }

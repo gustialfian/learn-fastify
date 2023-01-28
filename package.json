@@ -8,9 +8,9 @@
   },
   "scripts": {
     "test": "tap --no-coverage",
-    "start": "fastify start -l info app.js",
-    "start:quite": "fastify start -w app.js",
-    "dev": "fastify start -w -l info -P app.js"
+    "start": "fastify start -l info src/app.js",
+    "start:quite": "fastify start -w src/app.js",
+    "dev": "fastify start -w -l info -P src/app.js"
   },
   "keywords": [],
   "author": "",

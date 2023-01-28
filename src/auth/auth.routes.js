@@ -1,7 +1,6 @@
 'use strict'
 const S = require('fluent-json-schema')
-const Users = require('../../users')
-
+const AuthRepo = require('./auth.repo')
 
 module.exports = async function (fastify, opts) {
     fastify.post('/sign-in', signIn.opt, signIn.handler(fastify))
@@ -21,7 +20,7 @@ const signIn = {
         },
     },
     handler: (fastify) => async (req, reply) => {
-        const access_token = await Users.signin(fastify, {
+        const access_token = await AuthRepo.signin(fastify, {
             username: req.body.username,
             password: req.body.password,
         })

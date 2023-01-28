@@ -1,6 +1,6 @@
 'use strict'
 const S = require('fluent-json-schema')
-const Users = require('../../users')
+const UsersRepo = require('./users.repo')
 
 
 module.exports = async function (fastify, opts) {
@@ -25,7 +25,7 @@ const createOpt = {
     },
 }
 const create = (fastify) => async (req, reply) => {
-    const id = await Users.create(fastify, {
+    const id = await UsersRepo.create(fastify, {
         username: req.body.username,
         password: req.body.password,
     })
@@ -48,7 +48,7 @@ const allOpt = {
     }
 }
 const all = (fastify) => async (req, reply) => {
-    const data = await Users.all(fastify)
+    const data = await UsersRepo.all(fastify)
     return data
 }
 
@@ -73,7 +73,7 @@ const byIdOpt = {
     }
 }
 const byId = (fastify) => async (req, reply) => {
-    const data = await Users.byId(fastify, req.params.id)
+    const data = await UsersRepo.byId(fastify, req.params.id)
     return data
 }
 
@@ -92,7 +92,7 @@ const updateOpt = {
     }
 }
 const update = (fastify) => async (req, reply) => {
-    await Users.update(fastify, req.params.id, {
+    await UsersRepo.update(fastify, req.params.id, {
         username: req.body.username,
         password: req.body.password,
     })
@@ -113,6 +113,6 @@ const removeOpt = {
     }
 }
 const remove = (fastify) => async (req, reply) => {
-    const data = await Users.delete(fastify, req.params.id)
+    const data = await UsersRepo.delete(fastify, req.params.id)
     return data
 }

@@ -14,7 +14,7 @@ SavingsRepo.saveSnapshot = async function ({ pg }, { last_id, payload }) {
     await pg.query(sql, params)
 }
 
-SavingsRepo.allLogs = async function ({ pg }, saving_id, last_id) {
+SavingsRepo.allEvent = async function ({ pg }, saving_id, last_id) {
     const sql = `select id, type, saving_id, payload, created_at from savings_log where saving_id = $1 and id > $2`
     const params = [saving_id, last_id ?? '0']
     const { rows } = await pg.query(sql, params)

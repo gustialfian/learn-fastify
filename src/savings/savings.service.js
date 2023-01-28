@@ -2,11 +2,14 @@
 
 const ULID = require('ulid')
 
+const Savings = module.exports
+
 const STATUS = {
     ACTIVE: 'ACTIVE',
     BLOCK: 'BLOCK',
     APPROVAL: {
         ACTIVATE: 'APPROVAL.ACTIVATE',
+        BLOCK: 'APPROVAL.BLOCK',
     },
 }
 const EVENT_TYPE = {
@@ -14,9 +17,10 @@ const EVENT_TYPE = {
     ACTIVATE: 'ACTIVATE',
     DEPOSIT: 'DEPOSIT',
     WITHDRAW: 'WITHDRAW',
+    BLOCK: 'BLOCK',
 }
 
-function create(saving) {
+Savings.create = function (saving) {
     return {
         id: ULID.ulid(),
         type: EVENT_TYPE.CREATE,
@@ -29,7 +33,7 @@ function create(saving) {
     }
 }
 
-function activate(saving_id) {
+Savings.activate = function (saving_id) {
     return {
         id: ULID.ulid(),
         type: EVENT_TYPE.ACTIVATE,
@@ -37,7 +41,15 @@ function activate(saving_id) {
     }
 }
 
-function deposit(saving_id, amount) {
+Savings.block = function (saving_id) {
+    return {
+        id: ULID.ulid(),
+        type: EVENT_TYPE.BLOCK,
+        saving_id: saving_id
+    }
+}
+
+Savings.deposit = function (saving_id, amount) {
     return {
         id: ULID.ulid(),
         type: EVENT_TYPE.DEPOSIT,
@@ -48,7 +60,7 @@ function deposit(saving_id, amount) {
     }
 }
 
-function withdraw(saving_id, amount) {
+Savings.withdraw = function (saving_id, amount) {
     return {
         id: ULID.ulid(),
         type: EVENT_TYPE.WITHDRAW,
@@ -59,8 +71,7 @@ function withdraw(saving_id, amount) {
     }
 }
 
-function on(saving, event) {
-    // do side evect
+Savings.on = function (saving, event) {
     switch (event.type) {
         case EVENT_TYPE.CREATE:
             return {
@@ -74,6 +85,9 @@ function on(saving, event) {
             if (saving.id !== event.saving_id) {
                 throw new Error(`saving id different form event ${saving.id} !== ${event.saving_id}`)
             }
+            if (saving.status === STATUS.ACTIVE) {
+                return saving
+            }
             if (saving.status !== STATUS.APPROVAL.ACTIVATE) {
                 throw new Error(`saving not in ${STATUS.APPROVAL.ACTIVATE}`)
             }
@@ -84,6 +98,15 @@ function on(saving, event) {
                 status: STATUS.ACTIVE,
             }
 
+        case EVENT_TYPE.BLOCK:
+            if (saving.saving !== STATUS.ACTIVE) {
+                throw new Error(`saving not ${STATUS.ACTIVE}`)
+            }
+            return {
+                ...saving,
+                status: STATUS.APPROVAL.BLOCK
+            }
+
         case EVENT_TYPE.DEPOSIT:
             if (saving.id !== event.saving_id) {
                 throw new Error(`saving id different form event ${saving.id} !== ${event.saving_id}`)
@@ -92,6 +115,7 @@ function on(saving, event) {
                 ...saving,
                 balance: saving.balance + event.payload.amount,
             }
+
         case EVENT_TYPE.WITHDRAW:
             if (saving.id !== event.saving_id) {
                 throw new Error(`saving id different form event ${saving.id} !== ${event.saving_id}`)
@@ -107,13 +131,4 @@ function on(saving, event) {
         default:
             throw new Error(`unknown event type: ${event.type}`)
     }
-}
-
-module.exports = {
-    STATUS,
-    create,
-    activate,
-    deposit,
-    withdraw,
-    on,
 }

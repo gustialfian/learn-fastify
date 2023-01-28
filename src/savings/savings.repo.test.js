@@ -1,8 +1,6 @@
 'use strict'
-
 const t = require('tap')
 const { Pool } = require('pg')
-const ULID = require('ulid')
 const Savings = require('./savings.service')
 const SavingsRepo = require('./savings.repo')
 
@@ -61,7 +59,7 @@ t.test('allLogs', async (ct) => {
     const e2 = Savings.activate(e1.saving_id)
     await SavingsRepo.saveEvent({ pg }, e2)
 
-    const got = await SavingsRepo.allLogs({ pg }, e1.saving_id)
+    const got = await SavingsRepo.allEvent({ pg }, e1.saving_id)
 
     ct.has(got, [e1, e2])
 })
@@ -76,7 +74,7 @@ t.test('allLogs with last_id', async (ct) => {
     const e2 = Savings.activate(e1.saving_id)
     await SavingsRepo.saveEvent({ pg }, e2)
 
-    const got = await SavingsRepo.allLogs({ pg }, e1.saving_id, e1.id)
+    const got = await SavingsRepo.allEvent({ pg }, e1.saving_id, e1.id)
 
     ct.has(got, [e2])
 })

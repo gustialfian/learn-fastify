@@ -19,12 +19,7 @@ module.exports = async function (fastify, opts) {
     options: Object.assign({}, opts)
   })
 
-  // This loads all plugins defined in routes
-  // define your routes in one of these
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, 'routes'),
-    options: Object.assign({}, opts)
-  })
-
+  fastify.register(require('./auth/auth.routes'), { prefix: '/auth' })
+  fastify.register(require('./users/users.routes'), { prefix: '/users' })
   fastify.register(require('./savings/savings.routes'), { prefix: '/savings' })
 }
