@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tap --no-coverage",
-    "test:cov": "tap --coverage-report=lcov",
+    "test:cov": "tap && tap --coverage-report=lcov",
     "start": "fastify start -l info src/app.js",
     "start:quite": "fastify start -w src/app.js",
     "dev": "fastify start -w -l info -P src/app.js"
