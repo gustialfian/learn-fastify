@@ -3,7 +3,7 @@ create table if not exists users (
     username varchar(255) unique,
     password varchar(255),
     created_at timestamp default current_timestamp
-)
+);
 
 create table if not exists savings_log (
     id varchar(255) primary key, 
@@ -11,10 +11,17 @@ create table if not exists savings_log (
     saving_id varchar(255), 
     payload jsonb,
     created_at timestamp default current_timestamp
-)
+);
 
 create table if not exists savings_snapshot (
     last_id varchar(255) primary key, 
     payload jsonb,
     created_at timestamp default current_timestamp
-)
+);
+
+create table if not exists savings (
+    id varchar(255) primary key,
+    user_id varchar(255),
+    balance int,
+    status varchar(255)
+);

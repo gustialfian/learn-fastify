@@ -64,7 +64,7 @@ POST http://localhost:3000/savings/activate HTTP/1.1
 content-type: application/json
 
 {
-    "saving_id": "01GQVS7Z5NYY66BZZ309V7QKB6"
+    "saving_id": "01GQYNTQA5Q3S8A2CV0VTYHYYX"
 }
 
 ### 

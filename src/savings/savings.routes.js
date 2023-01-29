@@ -22,21 +22,26 @@ const savingsCreate = {
                 200: S.object()
                     .prop('message', S.string())
                     .prop('data', S.object()
-                        .prop('saving_id', S.string())
+                        .prop('id', S.string())
+                        .prop('user_id', S.string())
+                        .prop('balance', S.number())
+                        .prop('status', S.string())
                     )
             }
         }
     },
     handler: (fastify) => async (req, reply) => {
         const { user_id, balance } = req.body
+
         const event = Savings.create({ user_id, balance })
+        const saving = Savings.on({}, event)
+
+        await SavingsRepo.save(fastify, saving)
         await SavingsRepo.saveEvent(fastify, event)
 
         return {
             message: 'ok',
-            data: {
-                saving_id: event.saving_id,
-            },
+            data: saving,
         }
     },
 }
@@ -50,18 +55,31 @@ const savingsActivate = {
             response: {
                 200: S.object()
                     .prop('message', S.string())
-                    .prop('data', S.object())
+                    .prop('data', S.object()
+                        .prop('id', S.string())
+                        .prop('user_id', S.string())
+                        .prop('balance', S.number())
+                        .prop('status', S.string())
+                    )
             }
         }
     },
     handler: (fastify) => async (req, reply) => {
         const { saving_id } = req.body
+        const savingCur = await SavingsRepo.byId(fastify, saving_id)
+
+        if (savingCur.status !== Savings.STATUS.APPROVAL.ACTIVATE) {
+            return reply.badRequest(`status is not ${Savings.STATUS.APPROVAL.ACTIVATE}`)
+        }
         const event = Savings.activate(saving_id)
+        const saving = Savings.on(savingCur, event)
+
+        await SavingsRepo.update(fastify, saving)
         await SavingsRepo.saveEvent(fastify, event)
 
         return {
             message: 'ok',
-            data: {},
+            data: saving,
         }
     },
 }

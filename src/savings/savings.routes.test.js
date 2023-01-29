@@ -1,6 +1,7 @@
 'use strict'
 const tap = require('tap')
 const Fastify = require('fastify')
+const Savings = require('./savings.service')
 
 function setup(t, { SavingsRepo }) {
     const route = t.mock('./savings.routes', {
@@ -15,7 +16,8 @@ function setup(t, { SavingsRepo }) {
 tap.test('POST /savings/create should ok', async (t) => {
     const fastify = setup(t, {
         SavingsRepo: {
-            saveEvent: () => Promise.resolve()
+            save: () => Promise.resolve(),
+            saveEvent: () => Promise.resolve(),
         }
     })
 
@@ -53,7 +55,12 @@ tap.test('POST /savings/create should error', async (t) => {
 tap.test('POST /savings/activate should ok', async (t) => {
     const fastify = setup(t, {
         SavingsRepo: {
-            saveEvent: () => Promise.resolve()
+            byId: () => Promise.resolve({
+                id: '1',
+                status: Savings.STATUS.APPROVAL.ACTIVATE,
+            }),
+            update: () => Promise.resolve(),
+            saveEvent: () => Promise.resolve(),
         }
     })
 
@@ -66,6 +73,7 @@ tap.test('POST /savings/activate should ok', async (t) => {
     })
 
     t.equal(res.statusCode, 200)
+    console.log(res.json());
 })
 
 tap.test('POST /savings/deposit should ok', async (t) => {
