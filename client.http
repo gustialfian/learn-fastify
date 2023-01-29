@@ -8,6 +8,10 @@ content-type: application/json
 }
 
 ###
+GET http://localhost:3000/auth/guarded HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxhYiIsImlhdCI6MTY3NDk5MjE5Nn0.1ZMITgFc4yyYFwgYTaEiQowszOBvckL9bdO98VkaPlI
+
+###
 POST http://localhost:3000/users HTTP/1.1
 content-type: application/json
 

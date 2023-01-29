@@ -4,6 +4,7 @@ const AuthRepo = require('./auth.repo')
 
 module.exports = async function (fastify, opts) {
     fastify.post('/sign-in', signIn.opt, signIn.handler(fastify))
+    fastify.get('/guarded', guarded.opt(fastify), guarded.handler(fastify))
 }
 
 const signIn = {
@@ -25,5 +26,24 @@ const signIn = {
             password: req.body.password,
         })
         return { access_token }
+    }
+}
+
+const guarded = {
+    opt: (fastify) => ({
+        schema: {
+            tags: ['auth'],
+            response: {
+                200: S.string()
+            }
+        },
+        preHandler: async (req, reply) => {
+            await req.jwtVerify().catch(err => {
+                reply.send(err)
+            })
+        }
+    }),
+    handler: (fastify) => async (req, reply) => {
+        return 'ok'
     }
 }
