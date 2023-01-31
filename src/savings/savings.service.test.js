@@ -68,7 +68,7 @@ tap.test('Savings.on unknown event', async (t) => {
     }))
 })
 
-tap.test('Savings.on create success', async (t) => {
+tap.test('Savings.on create', async (t) => {
     const got = SavingsService.on({}, {
         id: 'test-id',
         type: 'CREATE',
@@ -85,5 +85,95 @@ tap.test('Savings.on create success', async (t) => {
         user_id: 99,
         balance: 10,
         status: 'APPROVAL.ACTIVATE'
+    })
+})
+
+tap.test('Savings.on ACTIVATE', async (t) => {
+    const s = {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 10,
+        status: 'APPROVAL.ACTIVATE'
+    }
+    const e = {
+        type: 'ACTIVATE',
+        saving_id: 'test-sid'
+    }
+    const got = SavingsService.on(s, e)
+
+    t.has(got, {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 10,
+        status: 'ACTIVE'
+    })
+})
+
+tap.test('Savings.on BLOCK', async (t) => {
+    const s = {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 10,
+        status: 'ACTIVE'
+    }
+    const e = {
+        type: 'BLOCK',
+        saving_id: 'test-sid'
+    }
+    const got = SavingsService.on(s, e)
+
+    t.has(got, {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 10,
+        status: 'APPROVAL.BLOCK'
+    })
+})
+
+tap.test('Savings.on DEPOSIT', async (t) => {
+    const s = {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 10,
+        status: 'ACTIVE'
+    }
+    const e = {
+        type: 'DEPOSIT',
+        saving_id: 'test-sid',
+        payload: {
+            amount: 10,
+        }
+    }
+    const got = SavingsService.on(s, e)
+
+    t.has(got, {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 20,
+        status: 'ACTIVE'
+    })
+})
+
+tap.test('Savings.on WITHDRAW', async (t) => {
+    const s = {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 10,
+        status: 'ACTIVE'
+    }
+    const e = {
+        type: 'WITHDRAW',
+        saving_id: 'test-sid',
+        payload: {
+            amount: 5,
+        }
+    }
+    const got = SavingsService.on(s, e)
+
+    t.has(got, {
+        id: 'test-sid',
+        user_id: 99,
+        balance: 5,
+        status: 'ACTIVE'
     })
 })

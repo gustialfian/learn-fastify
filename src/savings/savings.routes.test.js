@@ -73,7 +73,6 @@ tap.test('POST /savings/activate should ok', async (t) => {
     })
 
     t.equal(res.statusCode, 200)
-    console.log(res.json());
 })
 
 tap.test('POST /savings/deposit should ok', async (t) => {
