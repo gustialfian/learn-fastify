@@ -8,6 +8,7 @@ module.exports = async function (fastify, opts) {
     fastify.post('/activate', savingsActivate.opt, savingsActivate.handler(fastify))
     fastify.post('/deposit', savingsDeposit.opt, savingsDeposit.handler(fastify))
     fastify.post('/withdraw', savingsWithdraw.opt, savingsWithdraw.handler(fastify))
+    fastify.post('/block', savingsBlock.opt, savingsBlock.handler(fastify))
     fastify.get('/:saving_id', savingsById.opt, savingsById.handler(fastify))
 }
 
@@ -25,8 +26,7 @@ const savingsCreate = {
                         .prop('id', S.string())
                         .prop('user_id', S.string())
                         .prop('balance', S.number())
-                        .prop('status', S.string())
-                    )
+                        .prop('status', S.string()))
             }
         }
     },
@@ -59,8 +59,7 @@ const savingsActivate = {
                         .prop('id', S.string())
                         .prop('user_id', S.string())
                         .prop('balance', S.number())
-                        .prop('status', S.string())
-                    )
+                        .prop('status', S.string()))
             }
         }
     },
@@ -94,18 +93,33 @@ const savingsDeposit = {
             response: {
                 200: S.object()
                     .prop('message', S.string())
-                    .prop('data', S.object())
+                    .prop('data', S.object()
+                        .prop('id', S.string())
+                        .prop('user_id', S.string())
+                        .prop('balance', S.number())
+                        .prop('status', S.string()))
             }
         }
     },
     handler: (fastify) => async (req, reply) => {
         const { saving_id, amount } = req.body
+        const savingCur = await SavingsRepo.byId(fastify, saving_id)
+
+        if (savingCur.status !== Savings.STATUS.ACTIVE) {
+            return reply.badRequest(`status is not ${Savings.STATUS.ACTIVE}`)
+        }
+        if (amount < 0) {
+            return reply.badRequest(`amount less than 0: ${amount}`)
+        }
         const event = Savings.deposit(saving_id, amount)
+        const saving = Savings.on(savingCur, event)
+
+        await SavingsRepo.update(fastify, saving)
         await SavingsRepo.saveEvent(fastify, event)
 
         return {
             message: 'ok',
-            data: {},
+            data: saving,
         }
     },
 }
@@ -120,18 +134,33 @@ const savingsWithdraw = {
             response: {
                 200: S.object()
                     .prop('message', S.string())
-                    .prop('data', S.object())
+                    .prop('data', S.object()
+                        .prop('id', S.string())
+                        .prop('user_id', S.string())
+                        .prop('balance', S.number())
+                        .prop('status', S.string()))
             }
         }
     },
     handler: (fastify) => async (req, reply) => {
         const { saving_id, amount } = req.body
+        const savingCur = await SavingsRepo.byId(fastify, saving_id)
+
+        if (savingCur.status !== Savings.STATUS.ACTIVE) {
+            return reply.badRequest(`status is not ${Savings.STATUS.ACTIVE}`)
+        }
+        if (amount > savingCur.balance) {
+            return reply.badRequest(`amount bigger than balance: ${amount}`)
+        }
         const event = Savings.withdraw(saving_id, amount)
+        const saving = Savings.on(savingCur, event)
+
+        await SavingsRepo.update(fastify, saving)
         await SavingsRepo.saveEvent(fastify, event)
 
         return {
             message: 'ok',
-            data: {},
+            data: saving,
         }
     },
 }
@@ -165,4 +194,43 @@ const savingsById = {
             data: result
         }
     }
+}
+
+const savingsBlock = {
+    opt: {
+        schema: {
+            tags: ['savings'],
+            body: S.object()
+                .prop('saving_id', S.string()),
+            response: {
+                200: S.object()
+                    .prop('message', S.string())
+                    .prop('data', S.object()
+                        .prop('id', S.string())
+                        .prop('user_id', S.number())
+                        .prop('balance', S.number())
+                        .prop('status', S.string())
+                    )
+            }
+        }
+    },
+    handler: (fastify) => async (req, reply) => {
+        const { saving_id } = req.body
+        const savingCur = await SavingsRepo.byId(fastify, saving_id)
+
+        if (savingCur.status !== Savings.STATUS.ACTIVE) {
+            console.log(savingCur.status, Savings.STATUS.ACTIVATE);
+            return reply.badRequest(`status is not ${Savings.STATUS.ACTIVATE}`)
+        }
+        const event = Savings.block(saving_id)
+        const saving = Savings.on(savingCur, event)
+
+        await SavingsRepo.update(fastify, saving)
+        await SavingsRepo.saveEvent(fastify, event)
+
+        return {
+            message: 'ok',
+            data: saving,
+        }
+    },
 }
