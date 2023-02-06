@@ -67,6 +67,9 @@ const savingsActivate = {
         const { saving_id } = req.body
         const savingCur = await SavingsRepo.byId(fastify, saving_id)
 
+        if (!savingCur) {
+            return reply.badRequest(`saving not found: ${saving_id}`)
+        }
         if (savingCur.status !== Savings.STATUS.APPROVAL.ACTIVATE) {
             return reply.badRequest(`status is not ${Savings.STATUS.APPROVAL.ACTIVATE}`)
         }
@@ -105,6 +108,9 @@ const savingsDeposit = {
         const { saving_id, amount } = req.body
         const savingCur = await SavingsRepo.byId(fastify, saving_id)
 
+        if (!savingCur) {
+            return reply.badRequest(`saving not found: ${saving_id}`)
+        }
         if (savingCur.status !== Savings.STATUS.ACTIVE) {
             return reply.badRequest(`status is not ${Savings.STATUS.ACTIVE}`)
         }
@@ -146,6 +152,9 @@ const savingsWithdraw = {
         const { saving_id, amount } = req.body
         const savingCur = await SavingsRepo.byId(fastify, saving_id)
 
+        if (!savingCur) {
+            return reply.badRequest(`saving not found: ${saving_id}`)
+        }
         if (savingCur.status !== Savings.STATUS.ACTIVE) {
             return reply.badRequest(`status is not ${Savings.STATUS.ACTIVE}`)
         }
@@ -218,6 +227,9 @@ const savingsBlock = {
         const { saving_id } = req.body
         const savingCur = await SavingsRepo.byId(fastify, saving_id)
 
+        if (!savingCur) {
+            return reply.badRequest(`saving not found: ${saving_id}`)
+        }
         if (savingCur.status !== Savings.STATUS.ACTIVE) {
             console.log(savingCur.status, Savings.STATUS.ACTIVATE);
             return reply.badRequest(`status is not ${Savings.STATUS.ACTIVATE}`)
