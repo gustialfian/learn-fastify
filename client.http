@@ -8,7 +8,25 @@ content-type: application/json
 }
 
 ###
-GET http://localhost:3000/auth/guarded HTTP/1.1
+POST http://localhost:3000/auth/sign-up HTTP/1.1
+content-type: application/json
+
+{
+    "username": "lab",
+    "password": "lab"
+}
+
+###
+GET http://localhost:3000/auth/authentication HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxhYiIsImlhdCI6MTY3NDk5MjE5Nn0.1ZMITgFc4yyYFwgYTaEiQowszOBvckL9bdO98VkaPlI
+
+
+###
+GET http://localhost:3000/auth/authorization/a/1 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxhYiIsImlhdCI6MTY3NDk5MjE5Nn0.1ZMITgFc4yyYFwgYTaEiQowszOBvckL9bdO98VkaPlI
+
+###
+GET http://localhost:3000/auth/authorization/b/1 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxhYiIsImlhdCI6MTY3NDk5MjE5Nn0.1ZMITgFc4yyYFwgYTaEiQowszOBvckL9bdO98VkaPlI
 
 ###
@@ -64,7 +82,7 @@ POST http://localhost:3000/savings/activate HTTP/1.1
 content-type: application/json
 
 {
-    "saving_id": "01GR420BR1WZ1D1G2V61VGDX91xxx"
+    "saving_id": "01GR420BR1WZ1D1G2V61VGDX91"
 }
 
 ### 
@@ -72,7 +90,7 @@ POST http://localhost:3000/savings/deposit HTTP/1.1
 content-type: application/json
 
 {
-    "saving_id": "01GR420BR1WZ1D1G2V61VGDX91",
+    "saving_id": "01GQYNTQA5Q3S8A2CV0VTYHYYX",
     "amount": 1
 }
 
@@ -81,7 +99,7 @@ POST http://localhost:3000/savings/withdraw HTTP/1.1
 content-type: application/json
 
 {
-    "saving_id": "01GR420BR1WZ1D1G2V61VGDX91",
+    "saving_id": "01GQYNTQA5Q3S8A2CV0VTYHYYX",
     "amount": 1
 }
 
